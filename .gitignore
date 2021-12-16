@@ -1,0 +1,6 @@
+scratchpad.py
+__pycache__
+*/__pycache__
+.vscode
+ntm_classifier/*.egg*
+*.egg*
