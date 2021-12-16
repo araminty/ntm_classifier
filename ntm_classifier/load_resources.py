@@ -1,5 +1,5 @@
 import json
-import pickle
+# import pickle
 import torch
 
 from collections import OrderedDict
@@ -66,10 +66,14 @@ def load_test_tensor():
         result = torch.load(file)
     return result
 
+
 def load_test_page():
     tensor_path = resource_filename('ntm_data.test_files', 'sample_page.png')
     return Image.open(tensor_path)
 
-def load_test_slice():
-    tensor_path = resource_filename('ntm_data.test_files', 'test_slice.png')
+
+def load_test_crop(filename='425,600_625,780.png'):
+    tensor_path = resource_filename(
+        'ntm_data.test_files',
+        f"test_crops/{filename}")
     return Image.open(tensor_path)

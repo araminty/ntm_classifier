@@ -1,6 +1,5 @@
 from typing import Union
 from PIL import Image
-from numpy import ndarray
 from torchvision import transforms
 from torch import Tensor
 
@@ -13,21 +12,27 @@ preprocess = transforms.Compose([
     transforms.Resize(256),
     transforms.CenterCrop(224),
     transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    transforms.Normalize(
+        mean=[0.485, 0.456, 0.406],
+        std=[0.229, 0.224, 0.225]
+    ),
 ])
 
 normalize_only = transforms.Compose([
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    transforms.Normalize(
+        mean=[0.485, 0.456, 0.406],
+        std=[0.229, 0.224, 0.225]
+    ),
 ])
 
-def img_to_tensor(img: Union[img_class, Tensor], silently: bool = False):
-    if isinstance(img, Tensor):
-        return normalize_only(png_img)
 
-    if isinstance(img, img_class):
+def img_to_tensor(img: Union[img_class, Tensor]):
+    if isinstance(img, Tensor):
+        return normalize_only(img)
+
+    elif isinstance(img, img_class):
         return preprocess(img).unsqueeze(0)
 
-    if not silently:
-        print("Passed object was not a PIL png file,"
-                " could not convert to array")
-    return None
+    else:
+        raise ValueError("Passed object was not a PIL png file,"
+                         " could not convert to array")

@@ -10,7 +10,7 @@ from ntm_classifier.load_resources import (
     load_test_image,
     load_test_tensor,
     load_test_page,
-    load_test_slice,
+    load_test_crop,
 )
 
 from PIL.Image import Image
@@ -31,8 +31,8 @@ class TestLoading(unittest.TestCase):
     def test_load_sample_page(self):
         self.assertIsInstance(load_test_page(), Image)
 
-    def test_load_sample_slice(self):
-        self.assertIsInstance(load_test_slice(), Image)
+    def test_load_sample_crop(self):
+        self.assertIsInstance(load_test_crop(), Image)
 
     def test_load_sample_tensor(self):
         self.assertIsInstance(load_test_tensor(), Tensor)

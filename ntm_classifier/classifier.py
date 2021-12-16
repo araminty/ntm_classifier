@@ -1,6 +1,6 @@
 from ntm_classifier.load_resources import load_mappings, load_primary
 from typing import Union
-import torch
+# import torch
 
 from ntm_classifier.preprocess import img_to_tensor
 
