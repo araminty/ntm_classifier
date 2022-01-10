@@ -4,3 +4,5 @@ __pycache__
 .vscode
 ntm_classifier/*.egg*
 *.egg*
+build
+*.ipynb

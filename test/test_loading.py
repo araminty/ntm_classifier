@@ -11,6 +11,7 @@ from ntm_classifier.load_resources import (
     load_test_tensor,
     load_test_page,
     load_test_crop,
+    load_classification_table,
 )
 
 from PIL.Image import Image
@@ -36,6 +37,10 @@ class TestLoading(unittest.TestCase):
 
     def test_load_sample_tensor(self):
         self.assertIsInstance(load_test_tensor(), Tensor)
+
+    def test_load_class_table(self):
+        from pandas import DataFrame
+        self.assertIsInstance(load_classification_table(), DataFrame)
 
 
 

@@ -12,9 +12,14 @@ from PIL.Image import Image
 
 
 def _convert_str_float(coordinates: str):
+    def strip_coord(coord: str):
+        if isinstance(coord, str):
+            return coord.replace(' ', '').strip('(').strip(')')
+        return coord
     coords = coordinates.split(',')
-    coords = (c.strip('(').strip(')') for c in coords)
-    return tuple(float(c) for c in coords if c.isnumeric)
+    # coords = coords.replace(' ', '')
+    coords = (strip_coord(c) for c in coords)
+    return tuple(float(c) for c in coords if c.isnumeric())
 
 
 def verify_coordinates(page: Image, coordinates: Union[str, tuple]):

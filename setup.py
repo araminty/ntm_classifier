@@ -9,7 +9,7 @@ with open('requirements.txt') as f:
 
 setuptools.setup(
     name="ntm_classifier",
-    version="0.1.0",
+    version="0.1.1",
     author="MACE",
     description="An externalized wrapper for classifying pngs",
     long_description=long_description,

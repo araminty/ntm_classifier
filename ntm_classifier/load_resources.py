@@ -37,10 +37,8 @@ def load_primary():
 
 
 def load_mappings():
-    return json.loads(
-        resource_string(
-            'ntm_data',
-            'mappings.json').decode('utf-8'))
+    resource = resource_string('ntm_data','mappings.json')
+    return json.loads(resource.decode('utf-8'))
 
 
 def load_mappings_reverse():
@@ -50,7 +48,9 @@ def load_mappings_reverse():
 
 def load_test_image():
     img_path = resource_filename('ntm_data.test_files', 'lighted.png')
-    return Image.open(img_path)
+    with Image.open(img_path) as img:
+        img = img.crop((0, 0, img.size[0], img.size[1]))
+        return img
 
 
 # def load_test_array():
@@ -68,12 +68,28 @@ def load_test_tensor():
 
 
 def load_test_page():
-    tensor_path = resource_filename('ntm_data.test_files', 'sample_page.png')
-    return Image.open(tensor_path)
+    img_path = resource_filename('ntm_data.test_files', 'sample_page.png')
+    with Image.open(img_path) as img:
+        img = img.crop((0, 0, img.size[0], img.size[1]))
+        return img
+
 
 
 def load_test_crop(filename='425,600_625,780.png'):
-    tensor_path = resource_filename(
-        'ntm_data.test_files',
-        f"test_crops/{filename}")
-    return Image.open(tensor_path)
+    img_path = resource_filename('ntm_data.test_files.test_crops',filename)
+    with Image.open(img_path) as img:
+        img = img.crop((0, 0, img.size[0], img.size[1]))
+        return img
+
+
+def load_classification_table(filename='tags.csv'):
+    import pandas as pd
+    data_path = resource_filename('ntm_data.table_data', filename)
+    return pd.read_csv(data_path)
+
+
+def load_report_image(filename='0.png'):
+    img_path = resource_filename('ntm_data.table_data.images',filename)
+    with Image.open(img_path) as img:
+        img = img.crop((0, 0, img.size[0], img.size[1]))
+        return img

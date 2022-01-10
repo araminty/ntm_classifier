@@ -17,10 +17,21 @@ from ntm_classifier.classifier import primary_mappings
 class TestCoordinateCheck(unittest.TestCase):
     test_page_png = load_test_page()
 
+    def test_verify_int_tuple(self):
+        page = self.test_page_png
+        test = verify_coordinates(page=page, coordinates=(154, 234))
+        self.assertEqual(test, (154, 234))
+
     def test_verify_int_string(self):
         page = self.test_page_png
         test = verify_coordinates(page=page, coordinates="(154, 234)")
         self.assertEqual(test, (154, 234))
+
+    def test_verify_float_tuple(self):
+        page = self.test_page_png
+        self.assertEqual((page.width, page.height), (2481, 3508))
+        test = verify_coordinates(page=page, coordinates=(.2, .3))
+        self.assertEqual(test, (496, 1052))
 
     def test_verify_float_string(self):
         page = self.test_page_png
@@ -43,7 +54,7 @@ class TestExtract(unittest.TestCase):
         result = extract_image(page, (.1713, .1710), (.2519, .2223))
         self.assertEqual(result, test_slice)
 
-        result = extract_image(page, "(.1713, .1710), (.2519, .2223)")
+        result = extract_image(page, "(.1713, .1710)", "(.2519, .2223)")
         self.assertEqual(result, test_slice)
 
     def test_extract_int(self):
@@ -53,7 +64,7 @@ class TestExtract(unittest.TestCase):
         self.assertEqual(result, test_slice)
         # self.assertEqual(np.asarray(result), np.asarray(test_slice))
 
-        result = extract_image(page, "(425, 600), (625, 780)")
+        result = extract_image(page, "(425, 600)", "(625, 780)")
         # self.assertEqual(np.asarray(result), np.asarray(test_slice))
         self.assertEqual(result, test_slice)
 
