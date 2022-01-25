@@ -6,7 +6,7 @@ The coordinates should be passed as pixel coordinates and x-y
 format.
 """
 
-from ntm_classifier.classifier import classify
+# from ntm_classifier.classifier import classify
 from typing import Union
 from PIL.Image import Image
 
@@ -52,6 +52,16 @@ def verify_coordinate_pair_from_str(page: Image, pair_str: str):
         Received {pair_str}""")
 
 
+def alt_str_format(bbox: str):
+    splits = bbox.split(',')[:4]
+    splits = splits + ['0'] * min(0, 4 - len(splits))
+    x1, y1, x2, y2 = splits
+
+    def num(s: str):
+        return int(round(float(s.strip())))
+    return (num(x1), num(y1)), (num(x2), num(y2))
+
+
 def extract_image(
         page: Image,
         upper_left: Union[str, tuple],
@@ -88,16 +98,3 @@ def extract_page_images(
             page, upper_left, lower_right)
 
     return extractions
-
-
-def classify_extractions_dictionary(images: dict):
-    return {coordinates: classify(png)
-            for (coordinates, png) in images.items()}
-
-
-def classify_page(
-        page: Image,
-        coordinates: Union[list, tuple]):
-
-    images = extract_page_images(page, coordinates)
-    return classify_extractions_dictionary(images)

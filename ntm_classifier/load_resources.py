@@ -37,7 +37,7 @@ def load_primary():
 
 
 def load_mappings():
-    resource = resource_string('ntm_data','mappings.json')
+    resource = resource_string('ntm_data', 'mappings.json')
     return json.loads(resource.decode('utf-8'))
 
 
@@ -74,9 +74,16 @@ def load_test_page():
         return img
 
 
+def load_test_whiteout_crop():
+    img_path = resource_filename('ntm_data.test_files',
+                                 'covered_test_example.png')
+    with Image.open(img_path) as img:
+        img = img.crop((0, 0, img.size[0], img.size[1]))
+        return img
+
 
 def load_test_crop(filename='425,600_625,780.png'):
-    img_path = resource_filename('ntm_data.test_files.test_crops',filename)
+    img_path = resource_filename('ntm_data.test_files.test_crops', filename)
     with Image.open(img_path) as img:
         img = img.crop((0, 0, img.size[0], img.size[1]))
         return img
@@ -89,7 +96,7 @@ def load_classification_table(filename='tags.csv'):
 
 
 def load_report_image(filename='0.png'):
-    img_path = resource_filename('ntm_data.table_data.images',filename)
+    img_path = resource_filename('ntm_data.table_data.images', filename)
     with Image.open(img_path) as img:
         img = img.crop((0, 0, img.size[0], img.size[1]))
         return img

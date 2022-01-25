@@ -17,6 +17,10 @@ from ntm_classifier.load_resources import (
 from PIL.Image import Image
 
 
+"""The package includes data for the models, files for the confusion matrix
+report and test case data.  This file serves to check that they successfully load."""
+
+
 class TestLoading(unittest.TestCase):
 
     def test_load_primary_model(self):
