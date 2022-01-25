@@ -33,6 +33,10 @@ def img_to_tensor(img: Union[img_class, Tensor]):
     elif isinstance(img, img_class):
         return preprocess(img).unsqueeze(0)
 
+        # If I'm unsqueezing here and I want to stack these later
+        # I'll need to remember to resqueeze before stacking
+        # and unsqueezing again
+
     else:
         raise ValueError("Passed object was not a PIL png file,"
                          " could not convert to array")

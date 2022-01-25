@@ -2,43 +2,55 @@ import json
 # import pickle
 import torch
 
-from collections import OrderedDict
+from collections import OrderedDict # noqa
 from pkg_resources import resource_string, resource_filename
 # from keras.preprocessing.image import load_img
 from PIL import Image
 
 
-def load_primary():
+def load_primary(n=14):
 
-    resnet50 = torch.hub.load(
-        'pytorch/vision:v0.10.0',
-        'resnet18',
-        pretrained=False)
+    resnet50 = torch.hub.load( # noqa
+        'NVIDIA/DeepLearningExamples:torchhub',
+        # num_classes=13,
+        'nvidia_resnet50',
+        pretrained=True,
+    )
 
-    model = torch.nn.Sequential(OrderedDict({
-        'resnet': resnet50,
-        'fc': torch.nn.Linear(1000, 13),
-        # 'categories': nn.LogSoftmax(dim=13),
-        'output': torch.nn.LogSoftmax(dim=1)
-    }))
+    model_path = resource_filename('ntm_data', 'resnet_50_13_5.pt')
 
-    # weights = torch.load(resource_stream('ntm_data', 'state_dict.pt'))
-    weights_path = resource_filename('ntm_data', 'state_dict.pt')
-    weights = torch.load(weights_path)
+    return torch.load(model_path)
 
-    try:
-        model.load_state_dict(weights)
-    except RuntimeError:
-        # TODO: This obviously needs to get removed
-        # but I'm still playing around with the exact model dimensions
-        print("model size mismatch")
+    # model = torch.nn.Sequential(OrderedDict({
+    #     'resnet': resnet50,
+    #     'fc': torch.nn.Linear(1000, n),
+    #     'output': torch.nn.LogSoftmax(dim=1)
+    # }))
 
-    return model
+    # # weights = torch.load(resource_stream('ntm_data', 'state_dict.pt'))
+    # weights_path = resource_filename('ntm_data', 'state_dict.pt')
+    # weights = torch.load(weights_path)
+
+    # try:
+    #     model.load_state_dict(weights)
+    # except RuntimeError:
+    #     # TODO: This obviously needs to get removed
+    #     # but I'm still playing around with the exact model dimensions
+    #     print("model size mismatch")
+
+    # return model
 
 
 def load_mappings():
     resource = resource_string('ntm_data', 'mappings.json')
     return json.loads(resource.decode('utf-8'))
+
+
+def process_mappings_group(group='primary'):
+    mappings = load_mappings()
+    group_mappings = mappings.get(group, {})
+    group_mappings = {int(k): v for (k, v) in group_mappings.items()}
+    return group_mappings
 
 
 def load_mappings_reverse():

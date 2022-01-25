@@ -28,7 +28,6 @@ class TestWhiteOut(unittest.TestCase):
         page_bb = "0,0,400,500"
         covered = whiteout_box(page, coords, page_bb=page_bb, as_array=False)
         self.assertEqual(covered, target)
-    
 
 
 if __name__ == '__main__':

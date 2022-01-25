@@ -1,4 +1,4 @@
-import pandas as pd
+# import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -8,15 +8,17 @@ from sklearn.metrics import confusion_matrix
 from ntm_classifier.load_resources import (
     load_classification_table,
     load_report_image,
-    load_test_crop,
+    # load_test_crop,
+    process_mappings_group,
 )
 
 from ntm_classifier.classifier import (
     classify,
-    primary_mappings,
+    # primary_mappings,
 )
 from tqdm import tqdm
 
+primary_mappings = process_mappings_group('primary')
 primary_mappings_lower = tuple(v.lower() for v in primary_mappings.values())
 
 
@@ -32,7 +34,7 @@ def get_heatmap(
         labels,
         title="Primary Labels Confusion Matrix"):
     fig, ax = plt.subplots(facecolor='white')
-    im = ax.imshow(matrix)
+    im = ax.imshow(matrix) # noqa
 
     # Show all ticks and label them with the respective list entries
     ax.set_xticks(np.arange(len(labels)), labels=labels)
@@ -45,7 +47,7 @@ def get_heatmap(
     # Loop over data dimensions and create text annotations.
     for i in range(len(labels)):
         for j in range(len(labels)):
-            text = ax.text(j, i, matrix[i, j],
+            text = ax.text(j, i, matrix[i, j], # noqa
                            ha="center", va="center", color="w")
 
     ax.set_title(title)
@@ -53,13 +55,16 @@ def get_heatmap(
     return fig
 
 
-def primary_report(df, labels):
+def primary_report(df, labels, model=None):
 
     tqdm.pandas(desc='building primary label row')
     df['primary'] = df['tags'].progress_apply(get_primary_if_any)
 
     tqdm.pandas(desc='loading images')
     df['image'] = df['file'].progress_apply(load_report_image)
+
+    if model is not None:
+        classify(df['image'].loc[0], model=model)
 
     tqdm.pandas(desc='running_classifier')
     df['results'] = df['image'].progress_apply(classify).str.lower()
