@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from PIL import Image
+# from PIL import Image
 
 from ntm_classifier.load_resources import (
     load_test_page,
@@ -24,7 +24,7 @@ class TestWhiteOut(unittest.TestCase):
     def test_blank_single_image(self):
         page = self.test_page.crop((300, 1000, 700, 1500))
         target = load_test_whiteout_crop()
-        coords = "125,50,325,230"
+        coords = "125,250,325,430"
         page_bb = "0,0,400,500"
         covered = whiteout_box(page, coords, page_bb=page_bb, as_array=False)
         self.assertEqual(covered, target)
