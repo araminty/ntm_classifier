@@ -33,7 +33,7 @@ def get_heatmap(
         matrix,
         labels,
         title="Primary Labels Confusion Matrix"):
-    fig, ax = plt.subplots(facecolor='white')
+    fig, ax = plt.subplots(facecolor='white', figsize=(7,7))
     im = ax.imshow(matrix) # noqa
 
     # Show all ticks and label them with the respective list entries
