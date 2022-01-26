@@ -2,24 +2,53 @@ import json
 # import pickle
 import torch
 
-from collections import OrderedDict # noqa
+from collections import OrderedDict  # noqa
 from pkg_resources import resource_string, resource_filename
 # from keras.preprocessing.image import load_img
 from PIL import Image
 
 
-def load_primary(n=14):
+def save_model_torch_script(
+        model,
+        input_dimensions=(5, 3, 224, 244),
+        name='unnamed_model.pt'):
+    filepath = resource_filename('ntm_data', name)
 
-    resnet50 = torch.hub.load( # noqa
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+    sample_shape = torch.rand(size=input_dimensions).to(device)
+    model = torch.jit.trace(model, sample_shape)
+    torch.jit.save(model, filepath)
+
+
+def load_base_model():
+    resnet50 = torch.hub.load(  # noqa
         'NVIDIA/DeepLearningExamples:torchhub',
         # num_classes=13,
         'nvidia_resnet50',
         pretrained=True,
     )
+    model_path = resource_filename('ntm_data', 'base_resnet50.pt')
+    return torch.load(model_path)
 
+
+def load_primary(n=14):
+    resnet50 = torch.hub.load(  # noqa
+        'NVIDIA/DeepLearningExamples:torchhub',
+        # num_classes=13,
+        'nvidia_resnet50',
+        pretrained=True,
+    )
     model_path = resource_filename('ntm_data', 'resnet_50_13_5.pt')
 
     return torch.load(model_path)
+
+    # resnet50 = torch.hub.load(  # noqa
+    #     'NVIDIA/DeepLearningExamples:torchhub',
+    #     # num_classes=13,
+    #     'nvidia_resnet50',
+    #     pretrained=True,
+    # )
 
     # model = torch.nn.Sequential(OrderedDict({
     #     'resnet': resnet50,
@@ -51,6 +80,11 @@ def process_mappings_group(group='primary'):
     group_mappings = mappings.get(group, {})
     group_mappings = {int(k): v for (k, v) in group_mappings.items()}
     return group_mappings
+
+
+def lowercase_inverted_mappings(group='primary'):
+    group_mappings = process_mappings_group(group)
+    return {v.lower(): k for (k, v) in group_mappings.items()}
 
 
 def load_mappings_reverse():

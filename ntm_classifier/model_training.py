@@ -1,5 +1,7 @@
 import torch
+import pandas as pd
 
+from pkg_resources import resource_filename
 from datasets import Dataset
 # from numpy import argmax
 
@@ -43,6 +45,51 @@ def get_primary_if_any(tags):
     return None
 
 
+def build_tag_mappings_from_group(
+        df: pd.DataFrame,
+        group: str = 'primary',
+        tag_list_column_name: str = 'tags',
+        file_column_name: str = 'file',
+        store=False):
+
+    result_df = df[[file_column_name, tag_list_column_name]].copy()
+    # result_df[file_column_name] = df[file_column_name]
+
+    mappings = process_mappings_group(group)
+    lowercases = {v.lower(): k for (k, v) in mappings.items()}
+
+    def get_first_matching_label(tags_str):
+        for label in lowercases:
+            if label in tags_str.lower():
+                return label
+        return None
+
+    if mappings == {}:
+        raise ValueError(f"{group} must be group from mappings "
+                         "json with at least one item")
+
+    name = (group if group not in (tag_list_column_name,
+                                   file_column_name) else 'label')
+
+    if use_tqdm:
+        tqdm.pandas(desc='building label row')
+        result_df[name] = df['tags'].progress_apply(get_first_matching_label)
+    else:
+        result_df[name] = df['tags'].apply(get_first_matching_label)
+
+    sort_index = df[file_column_name].str.strip('.png').\
+        apply(int).sort_values().index
+
+    result_df = result_df.loc[sort_index].reset_index(drop=True)
+
+    if store:
+        filepath = resource_filename(
+            'ntm_data.table_data', f"{name}_tags.csv")
+        result_df.to_csv(filepath, index=False)
+
+    return result_df
+
+
 # import numpy as np
 def ready_dataframe():
 
@@ -59,6 +106,10 @@ def ready_dataframe():
     else:
         df['image'] = df['file'].apply(load_report_image)
 
+    sort_index = df['file'].str.strip('.png').apply(int).sort_values().index
+
+    df = df.loc[sort_index].reset_index(drop=True)
+
     return df[['primary', 'image']]
 
     # df['array'] = df['image'].apply(np.array)
@@ -72,7 +123,6 @@ def ready_dataframe():
 
     # df['tensor'] = df['tensor'].apply(lambda x: x.unsqueeze(1))
 
- 
 
 class CustomDataset(Dataset):
 
@@ -82,7 +132,7 @@ class CustomDataset(Dataset):
             label_column: str = 'primary',
             # tensor_column: str = 'tensor',
             image_column: str = 'image',
-            ):
+    ):
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.device = device
 

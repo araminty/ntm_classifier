@@ -10,11 +10,8 @@ from ntm_classifier.classifier import (
     classify,
     primary_mappings,
 )
-from ntm_classifier.load_resources import (
-    load_test_image,
-    # load_test_array,
-    load_test_tensor,
-)
+from ntm_classifier.load_resources import load_test_image
+from ntm_classifier.load_resources import load_test_tensor
 
 
 class TestClassify(unittest.TestCase):
@@ -22,7 +19,8 @@ class TestClassify(unittest.TestCase):
     test_array = load_test_tensor()
 
     def test_convert_img_to_tensor(self):
-        result = img_to_tensor(self.test_image)
+        test_image = self.test_image
+        result = img_to_tensor(test_image)
         self.assertIsInstance(result, Tensor)
 
     def test_classify_tensor_to_int(self):

@@ -1,14 +1,5 @@
 # flake8: noqa
 
-from ntm_classifier.load_resources import process_mappings_group
-from ntm_classifier.report import primary_report, get_heatmap
-from random import randint
-from ntm_classifier.preprocess import preprocess
-from ntm_classifier.load_resources import (
-    load_classification_table,
-    load_report_image,
-    process_mappings_group,
-)
 import gc
 from collections import OrderedDict
 from torch import optim
@@ -21,7 +12,6 @@ images_dataset = CustomDataset(ready_dataframe())
 dl = torch.utils.data.DataLoader(images_dataset, batch_size=5)
 
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 resnet50 = torch.hub.load(
     'NVIDIA/DeepLearningExamples:torchhub',
@@ -31,6 +21,7 @@ resnet50 = torch.hub.load(
 )
 
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 resnet_50_14 = nn.Sequential(OrderedDict({
     'resnet': resnet50,
     'fc': nn.Linear(1000, 14),
@@ -77,7 +68,6 @@ def train_epoch(
 
     return running_loss / min(1, train_len)
 
-
 for i in range(1, epochs):
     training_loss = str(train_epoch())
     print(f"Epoch {i}| Training Loss: {training_loss}")
@@ -90,24 +80,28 @@ for i in range(1, epochs):
 torch.save(resnet_50_14, f'./resnet_50_13_{epochs}.pt')
 
 
+from ntm_classifier.load_resources import (
+    load_classification_table,
+    load_report_image,
+    process_mappings_group,
+)
+from ntm_classifier.preprocess import preprocess
 primary_mappings = process_mappings_group('primary')
 
 
 df = load_classification_table()
 
-
 def get_estimate(i):
-    guess = resnet_50_14(
-        preprocess(
-            load_report_image(
-                df['file'].loc[i])).unsqueeze(0).to(device)).argmax()
+    guess = resnet_50_14(preprocess(load_report_image(df['file'].loc[i])).unsqueeze(0).to(device)).argmax()
     return df['tags'].loc[i], guess.item(), primary_mappings.get(guess.item())
 
 
+from random import randint
 i = randint(0, 1000)
 get_estimate(i), i
 
 
+from ntm_classifier.report import primary_report, get_heatmap
 # labels = list(primary_mappings.keys())
 labels = list((p.lower() for p in primary_mappings.values()))
 
@@ -117,10 +111,28 @@ heat = get_heatmap(matrix, labels)
 primary_mappings.values()
 
 
+import torch
+from ntm_classifier.load_resources import process_mappings_group, load_classification_table
+from ntm_classifier.report import primary_report, get_heatmap
+df = load_classification_table()
+
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+resnet50 = torch.hub.load(
+    'NVIDIA/DeepLearningExamples:torchhub',
+    # num_classes=13,
+    'nvidia_resnet50',
+    pretrained=True,
+)
+
 primary_mappings = process_mappings_group('primary')
 labels = list((p.lower() for p in primary_mappings.values()))
-other_resnet = torch.load('./resnet_50_13_10.pt')
+
+resnet = torch.load('./resnet_50_13_10.pt')
+matrix = primary_report(df, labels=labels, model=other_resnet)
+heat = get_heatmap(matrix, labels)
 
 
+other_resnet = torch.load('../ntm_data/resnet_50_13_5.pt')
 matrix2 = primary_report(df, labels=labels, model=other_resnet)
 heat = get_heatmap(matrix2, labels)
