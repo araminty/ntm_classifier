@@ -10,7 +10,7 @@ from PIL import Image
 
 def save_model_torch_script(
         model,
-        input_dimensions=(5, 3, 224, 244),
+        input_dimensions=(5, 3, 224, 224),
         name='unnamed_model.pt'):
     filepath = resource_filename('ntm_data', name)
 
@@ -22,17 +22,17 @@ def save_model_torch_script(
 
 
 def load_base_model():
-    resnet50 = torch.hub.load(  # noqa
-        'NVIDIA/DeepLearningExamples:torchhub',
-        # num_classes=13,
-        'nvidia_resnet50',
-        pretrained=True,
-    )
+    # resnet50 = torch.hub.load(  # noqa
+    #     'NVIDIA/DeepLearningExamples:torchhub',
+    #     # num_classes=13,
+    #     'nvidia_resnet50',
+    #     pretrained=True,
+    # )
     model_path = resource_filename('ntm_data', 'base_resnet50.pt')
     return torch.load(model_path)
 
 
-def load_primary(n=14):
+def load_primary():
     resnet50 = torch.hub.load(  # noqa
         'NVIDIA/DeepLearningExamples:torchhub',
         # num_classes=13,

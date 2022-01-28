@@ -51,7 +51,7 @@ class ImageDataset(Dataset):
         self.transform = transform
         self.output_map = lowercase_inverted_mappings(output_labels)
 
-        self.inputs = self.load_images()
+        # self.inputs = self.load_images()
         self.outputs = self.map_outputs()
 
     def __len__(self):
@@ -61,14 +61,16 @@ class ImageDataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        image = self.images[idx]
-        if self.transform is not None:
-            if isinstance(image, Image.Image):
-                image = self.transform(image)
-            else:
-                image = torch.stack(list(map(self.transform, image)))
+        # image = self.images[idx]
+        # if self.transform is not None:
+        #     if isinstance(image, Image.Image):
+        #         image = self.transform(image)
+        #     else:
+        #         image = torch.stack(list(map(self.transform, image)))
 
-        sample = {'image': self.inputs[idx], 'result': self.outputs[idx]}
+        image = self.load_image_idx(idx)
+
+        sample = {'image': image, 'result': self.outputs[idx]}
 
         return sample
 
@@ -76,13 +78,26 @@ class ImageDataset(Dataset):
         output_labels = self.y.str.lower().apply(self.output_map.get)
         return torch.from_numpy(output_labels.values).to(self.device).long()
 
-    def load_images(self):
-        fn = self.filenames
-        if tqdm_check():
-            tqdm_c.pandas(desc="Loading images")
-            images = fn.progress_apply(load_report_image)
-        else:
-            images = fn.apply(load_report_image)
+    # def load_images(self):
+    #     fn = self.filenames
+    #     if tqdm_check():
+    #         tqdm_c.pandas(desc="Loading images")
+    #         images = fn.progress_apply(load_report_image)
+    #     else:
+    #         images = fn.apply(load_report_image)
 
-        self.images = images
-        return torch.stack(list(map(self.transform, images))).to(self.device)
+    #     self.images = images
+    #     return torch.stack(list(map(self.transform, images))).to(self.device)
+
+    def load_image_idx(self, idx):
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+        filenames = self.filenames.values[idx]
+        if isinstance(filenames, str):
+            image = load_report_image(filenames)
+            return self.transform(image).unsqueeze(0).to(self.device)
+        else:
+            images = map(load_report_image, filenames)
+            return torch.stack(
+                list(map(self.transform, images))).to(self.device)
+        # images = filenames.apply(load_report_image).values
