@@ -4,16 +4,16 @@ import torch
 from pandas import DataFrame
 from torch.utils.data import Dataset
 from torchvision import transforms
-from PIL import Image
+# from PIL import Image
 
 from ntm_classifier.load_resources import load_report_image
 from ntm_classifier.load_resources import load_classification_table
 from ntm_classifier.load_resources import lowercase_inverted_mappings
 from ntm_classifier.preprocess import preprocess as image_preprocess
-from ntm_classifier.check_tqdm import tqdm_check
+# from ntm_classifier.check_tqdm import tqdm_check
 
-if tqdm_check():
-    from tqdm import tqdm as tqdm_c
+# if tqdm_check():
+#     from tqdm import tqdm as tqdm_c
 
 
 # image_preprocess = transforms.Compose([
@@ -76,6 +76,8 @@ class ImageDataset(Dataset):
 
     def map_outputs(self):
         output_labels = self.y.str.lower().apply(self.output_map.get)
+        self.na_value = output_labels.max()+1.0
+        output_labels = output_labels.fillna(self.na_value)
         return torch.from_numpy(output_labels.values).to(self.device).long()
 
     # def load_images(self):

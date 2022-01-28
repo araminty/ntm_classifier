@@ -69,7 +69,7 @@ def extract_image(
     if lower_right is None and isinstance(upper_left, str):
         verify_coordinate_pair_from_str(page, upper_left)
     if lower_right is None and isinstance(upper_left, tuple):
-        if (len(upper_right) == 2 and
+        if (len(upper_left) == 2 and
             isinstance(upper_left[0], tuple) and
                 isinstance(upper_left[1], tuple)):
             upper_left, lower_right = upper_left

@@ -22,14 +22,16 @@ def save_model_torch_script(
 
 
 def load_base_model():
-    # resnet50 = torch.hub.load(  # noqa
-    #     'NVIDIA/DeepLearningExamples:torchhub',
-    #     # num_classes=13,
-    #     'nvidia_resnet50',
-    #     pretrained=True,
-    # )
-    model_path = resource_filename('ntm_data', 'base_resnet50.pt')
-    return torch.load(model_path)
+    resnet50 = torch.hub.load(  # noqa
+        'NVIDIA/DeepLearningExamples:torchhub',
+        # num_classes=13,
+        'nvidia_resnet50',
+        pretrained=True,
+    )
+
+    return resnet50
+    # model_path = resource_filename('ntm_data', 'base_resnet50.pt')
+    # return torch.load(model_path)
 
 
 def load_primary():

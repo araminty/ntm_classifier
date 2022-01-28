@@ -19,13 +19,17 @@ class Trainer:
     def __init__(
             self,
             dataset,
-            n_labels=14,
+            # n_labels=20,
             batch_size=5,
             use_tqdm=None,
-            epochs=EPOCHS):
-        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+            epochs=EPOCHS,
+            device='cpu'):
+        if device is None:
+            self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        else:
+            self.device = device
         self.epochs = epochs
-        self.n_labels = n_labels
+        self.n_labels = int(dataset.na_value+1)
         self.dataloader = torch.utils.data.DataLoader(
             dataset, batch_size=batch_size)
         self.criterion = nn.CrossEntropyLoss()
@@ -49,7 +53,7 @@ class Trainer:
             epochs=self.epochs)
 
     def train_epoch(self):
-        torch.cuda.empty_cache()
+        # torch.cuda.empty_cache()
         running_loss = 0.0
 
         if self.use_tqdm:
@@ -59,8 +63,8 @@ class Trainer:
             loop = enumerate(self.dataloader)
 
         for i, data in loop:
-            inputs = data['image']
-            targets = data['result']
+            inputs = data['image'].squeeze().to(self.device)
+            targets = data['result'].to(self.device)
 
             self.optimizer.zero_grad()
             outputs = self.network(inputs.to(self.device))
