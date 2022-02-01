@@ -30,7 +30,7 @@ class TestWhiteOut(unittest.TestCase):
                   '327.620,769.500,402.545,784.500',
                   '300.890,27.528,306.890,39.528']
 
-        combined = combine_adjacent_bboxes(text_lines)
+        combined = combine_adjacent_bboxes(text_lines, gap=0.1)
         self.assertEqual(combined, target)
 
     def test_redact_page_text_from_xml(self):
@@ -39,6 +39,14 @@ class TestWhiteOut(unittest.TestCase):
         target = load_test_page('redacted.png')
 
         redacted = whiteout_page_text(page, test_xml, invert_color=True)
+        self.assertEqual(redacted, target)
+
+    def test_redact_wider_gap(self):
+        page = load_test_page()
+        test_xml = load_xml_test()[0]
+        target = load_test_page('redacted2.png')
+
+        redacted = whiteout_page_text(page, test_xml, invert_color=True, gap=5)
         self.assertEqual(redacted, target)
 
     def test_blank_entire_page(self):

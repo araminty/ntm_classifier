@@ -34,14 +34,14 @@ def tree_get_textbox_locations_list(xml_tree, page_number):
     return page_get_textbox_locations_list(page)
 
 
-def page_get_textbox_locations_list(page_xml):
+def page_get_textbox_locations_list(page_xml, gap=0.1):
     def gen():
         for element in page_xml:
             if hasattr(element, 'text') and element.text.strip() != '':
                 bbox = element.get('bbox', None)
                 if bbox is not None:
                     yield bbox
-    return combine_adjacent_bboxes(gen())
+    return combine_adjacent_bboxes(gen(), gap=gap)
 
 
 def combine_adjacent_bboxes(bbox_gen, gap=0.1):
@@ -56,7 +56,7 @@ def combine_adjacent_bboxes(bbox_gen, gap=0.1):
                 (float(x) for x in curr)
             except:
                 continue
-            right_left_meet = (float(curr[0]) <= float(prev[2]) + gap)
+            right_left_meet = (float(curr[0]) - float(prev[2]) <= gap)
             top_bottom_match = (curr[1] == prev[1] and curr[3] == prev[3])
             if right_left_meet and top_bottom_match:
                 prev[2] = curr[2]
@@ -70,11 +70,12 @@ def combine_adjacent_bboxes(bbox_gen, gap=0.1):
 def whiteout_page_text(
         page: Union[np.ndarray, Image.Image],
         page_xml: Element,
-        invert_color=False,):
+        invert_color=False,
+        gap=0.1):
 
     as_array = isinstance(page, np.ndarray)
     page_bb = page_xml.get('bbox', "0.000,0.000,595.320,841.920")
-    bboxes = page_get_textbox_locations_list(page_xml)
+    bboxes = page_get_textbox_locations_list(page_xml, gap=gap)
     for bbox in bboxes:
         page = whiteout_box(
             page,
