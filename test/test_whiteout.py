@@ -6,14 +6,43 @@ from ntm_classifier.load_resources import (
     load_test_page,
     load_test_whiteout_crop,
 )
-from ntm_classifier.image_from_document import whiteout_box
+from ntm_classifier.image_from_document import (
+    whiteout_box,
+    whiteout_page_text,
+    combine_adjacent_bboxes,)
+from ntm_classifier.load_resources import (
+    load_xml_test, load_text_lines_list)
+
+from ntm_classifier.image_from_document import (
+    page_get_textbox_locations_list)
 
 
 class TestWhiteOut(unittest.TestCase):
-    test_page = load_test_page()
+
+    def test_combine_adjacent_bboxes(self):
+        text_lines = load_text_lines_list(
+            name='uncombined_bboxes.txt')[:20]
+
+        target = ['298.010,790.620,309.725,805.620',
+                  '205.130,769.500,280.025,784.500',
+                  '285.020,769.500,308.345,784.500',
+                  '313.340,769.500,327.500,784.500',
+                  '327.620,769.500,402.545,784.500',
+                  '300.890,27.528,306.890,39.528']
+
+        combined = combine_adjacent_bboxes(text_lines)
+        self.assertEqual(combined, target)
+
+    def test_redact_page_text_from_xml(self):
+        page = load_test_page()
+        test_xml = load_xml_test()[0]
+        target = load_test_page('redacted.png')
+
+        redacted = whiteout_page_text(page, test_xml, invert_color=True)
+        self.assertEqual(redacted, target)
 
     def test_blank_entire_page(self):
-        page = self.test_page.copy()
+        page = load_test_page()
 
         coords = f"0,0,{page.width},{page.height}"
 
@@ -22,7 +51,7 @@ class TestWhiteOut(unittest.TestCase):
         self.assertEqual(covered.sum(), 0)
 
     def test_blank_single_image(self):
-        page = self.test_page.crop((300, 1000, 700, 1500))
+        page = load_test_page().crop((300, 1000, 700, 1500))
         target = load_test_whiteout_crop()
         coords = "125,250,325,430"
         page_bb = "0,0,400,500"

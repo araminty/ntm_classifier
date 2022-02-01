@@ -1,6 +1,7 @@
 import numpy as np
 from PIL import Image
 from typing import Union
+from xml.etree.ElementTree import Element
 
 from ntm_classifier.extract import alt_str_format
 
@@ -33,12 +34,56 @@ def tree_get_textbox_locations_list(xml_tree, page_number):
     return page_get_textbox_locations_list(page)
 
 
-def page_get_textbox_locations_list(page):
+def page_get_textbox_locations_list(page_xml):
     def gen():
-        for element in page:
-            if element.tag == 'text':
-                yield element.get('bbox', '')
-    return list(gen())
+        for element in page_xml:
+            if hasattr(element, 'text') and element.text.strip() != '':
+                bbox = element.get('bbox', None)
+                if bbox is not None:
+                    yield bbox
+    return combine_adjacent_bboxes(gen())
+
+
+def combine_adjacent_bboxes(bbox_gen, gap=0.1):
+    def gen():
+        prev = ('0', '0', '0', '0')
+        for bbox in bbox_gen:
+            current = bbox
+            curr = current.split(',')
+            if not len(curr) == 4:
+                continue
+            try:
+                (float(x) for x in curr)
+            except:
+                continue
+            right_left_meet = (float(curr[0]) <= float(prev[2]) + gap)
+            top_bottom_match = (curr[1] == prev[1] and curr[3] == prev[3])
+            if right_left_meet and top_bottom_match:
+                prev[2] = curr[2]
+            else:
+                yield ','.join(prev)
+                prev = curr
+        yield ','.join(prev)
+    return list(gen())[1:]
+
+
+def whiteout_page_text(
+        page: Union[np.ndarray, Image.Image],
+        page_xml: Element,
+        invert_color=False,):
+
+    as_array = isinstance(page, np.ndarray)
+    page_bb = page_xml.get('bbox', "0.000,0.000,595.320,841.920")
+    bboxes = page_get_textbox_locations_list(page_xml)
+    for bbox in bboxes:
+        page = whiteout_box(
+            page,
+            bbox,
+            page_bb,
+            as_array,
+            invert_color=invert_color)
+
+    return page
 
 
 def whiteout_box(
@@ -75,7 +120,7 @@ def whiteout_box(
     # x1 = width-min((width, int(round(width*x2/px))))
     y2 = height - min((height, int(round(height * y2 / py))))
 
-    print(x1, x2, y1, x2)
+    # print(x1, x2, y1, x2)
 
     if invert_color:
         matrix[y2:y1, x1:x2] = 0
@@ -85,12 +130,6 @@ def whiteout_box(
     if as_array is True:
         return matrix
     return Image.fromarray(matrix)
-
-
-def whiteout_page_text(
-        page: Union[np.ndarray, Image.Image],
-        xml):
-    pass
 
 
 # def extract_image_with_textbox_whiteout():
