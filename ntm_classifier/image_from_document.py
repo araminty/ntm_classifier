@@ -133,13 +133,23 @@ def whiteout_box(
     return Image.fromarray(matrix)
 
 
+def floatify_str(bbox: str):
+    splits = bbox.split(',')[:4]
+    splits = splits + ['0'] * min(0, 4 - len(splits))
+    x1, y1, x2, y2 = splits
+
+    def num(s: str):
+        return float(s.strip())
+    return (num(x1), num(y1)), (num(x2), num(y2))
+
+
 def extract_page_image_bbox(
         image: Union[np.ndarray, Image.Image],
         bbox: Union[str, tuple],
         page_bb: str = "0.000,0.000,595.320,841.920",):
 
-    (x1, y1), (x2, y2) = alt_str_format(bbox)
-    (_, _), (px, py) = alt_str_format(page_bb)
+    (x1, y1), (x2, y2) = floatify_str(bbox)
+    (_, _), (px, py) = floatify_str(page_bb)
 
     width = image.width
     height = image.height

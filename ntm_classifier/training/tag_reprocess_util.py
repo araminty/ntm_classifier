@@ -3,17 +3,10 @@ import pandas as pd
 from pkg_resources import resource_filename
 from ntm_classifier.load_resources import process_mappings_group
 from ntm_classifier.load_resources import load_classification_table
+from ntm_classifier.check_tqdm import tqdm_check
 
-try:
-    get_ipython().__class__.__name__  # noqa
-    use_tqdm = True
+if tqdm_check():
     from tqdm import tqdm
-except BaseException:
-    if __name__ == '__main__':
-        use_tqdm = True
-        from tqdm import tqdm
-    else:
-        use_tqdm = False
 
 
 def build_tag_mappings_from_group(
@@ -45,7 +38,7 @@ def build_tag_mappings_from_group(
     name = (group if group not in (tag_list_column_name,
                                    file_column_name) else 'label')
 
-    if use_tqdm:
+    if tqdm_check():
         tqdm.pandas(desc='building label row')
         result_df[name] = df['tags'].progress_apply(get_first_matching_label)
     else:
