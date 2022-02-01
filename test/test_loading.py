@@ -5,7 +5,7 @@ from torch import Tensor
 
 
 from ntm_classifier.load_resources import (
-    load_primary,
+    load_model,
     load_mappings,
     load_test_image,
     load_test_tensor,
@@ -18,13 +18,14 @@ from PIL.Image import Image
 
 
 """The package includes data for the models, files for the confusion matrix
-report and test case data.  This file serves to check that they successfully load."""
+report and test case data.  This file serves to check that they
+successfully load."""
 
 
 class TestLoading(unittest.TestCase):
 
     def test_load_primary_model(self):
-        primary = load_primary()
+        primary = load_model()
         self.assertIsInstance(primary, Sequential)
 
     def test_load_mappings(self):
@@ -45,7 +46,6 @@ class TestLoading(unittest.TestCase):
     def test_load_class_table(self):
         from pandas import DataFrame
         self.assertIsInstance(load_classification_table(), DataFrame)
-
 
 
 if __name__ == '__main__':

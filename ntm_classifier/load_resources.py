@@ -20,7 +20,7 @@ def load_text_lines_list(name='uncombined_bboxes.txt'):
     filename = resource_filename('ntm_data.test_files', name)
     with open(filename) as file:
         lines = file.readlines()
-    return [l.strip('\n') for l in lines]
+    return [line.strip('\n') for line in lines]
 
 
 def save_model_torch_script(
@@ -49,14 +49,14 @@ def load_base_model():
     # return torch.load(model_path)
 
 
-def load_primary():
+def load_model(model_name="resnet_50_13_5.pt"):
     resnet50 = torch.hub.load(  # noqa
         'NVIDIA/DeepLearningExamples:torchhub',
         # num_classes=13,
         'nvidia_resnet50',
         pretrained=True,
     )
-    model_path = resource_filename('ntm_data', 'resnet_50_13_5.pt')
+    model_path = resource_filename('ntm_data', model_name)
 
     return torch.load(model_path)
 

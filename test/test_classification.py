@@ -9,9 +9,25 @@ from ntm_classifier.classifier import (
     label,
     classify,
     primary_mappings,
+    classify_page_from_xml
 )
-from ntm_classifier.load_resources import load_test_image
-from ntm_classifier.load_resources import load_test_tensor
+from ntm_classifier.load_resources import (
+    load_test_image,
+    load_test_tensor,
+    load_test_page,
+    load_xml_test)
+
+
+class TestPageClassify(unittest.TestCase):
+    def test_classify_page(self):
+        page = load_test_page()
+        xml = load_xml_test()[0]
+
+        bbox_cls_dict = classify_page_from_xml(page, xml)
+
+        for k, v in bbox_cls_dict.items():
+            self.assertEqual(len(k.split(',')), 4)
+            self.assertIn(v, primary_mappings.values())
 
 
 class TestClassify(unittest.TestCase):

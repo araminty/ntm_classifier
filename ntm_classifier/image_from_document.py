@@ -1,6 +1,6 @@
 import numpy as np
 from PIL import Image
-from typing import Union
+from typing import Union, Iterable
 from xml.etree.ElementTree import Element
 
 from ntm_classifier.extract import alt_str_format
@@ -19,9 +19,9 @@ def tree_extract_xml_figures(xml_tree, page_number):
     return page_extract_xml_figures(page)
 
 
-def page_extract_xml_figures(page):
+def page_extract_xml_figures(page_xml):
     def gen():
-        for element in page:
+        for element in page_xml:
             if element.tag == 'figure':
                 # yield {'page':page_number, element.get('bbox')}
                 yield element
@@ -54,7 +54,7 @@ def combine_adjacent_bboxes(bbox_gen, gap=0.1):
                 continue
             try:
                 (float(x) for x in curr)
-            except:
+            except ValueError:
                 continue
             right_left_meet = (float(curr[0]) - float(prev[2]) <= gap)
             top_bottom_match = (curr[1] == prev[1] and curr[3] == prev[3])
@@ -102,8 +102,8 @@ def whiteout_box(
         matrix = image
     if not isinstance(matrix, np.ndarray):
         if raise_error:
-            raise ValueError(
-                "Image passed to whiteout_box was not PIL Image or numpy array")
+            raise ValueError("Image passed to whiteout_box"
+                             " was not PIL Image or numpy array")
         return image
 
     (x1, y1), (x2, y2) = alt_str_format(bbox)
@@ -133,5 +133,33 @@ def whiteout_box(
     return Image.fromarray(matrix)
 
 
-# def extract_image_with_textbox_whiteout():
-#     pass
+def extract_page_image_bbox(
+        image: Union[np.ndarray, Image.Image],
+        bbox: Union[str, tuple],
+        page_bb: str = "0.000,0.000,595.320,841.920",):
+
+    (x1, y1), (x2, y2) = alt_str_format(bbox)
+    (_, _), (px, py) = alt_str_format(page_bb)
+
+    width = image.width
+    height = image.height
+
+    x1 = max(0, (width * x1 / px))
+    x2 = min(width, (width * x2 / px))
+    y1 = height - max(0, (height * y1 / py))
+    y2 = height - min(height, (height * y2 / py))
+
+    # Note: it is necessary to swap the order of the y coordinates
+    return image.crop((x1, y2, x2, y1))
+
+
+def extract_page_images_bboxes(
+        image: Union[np.ndarray, Image.Image],
+        bboxes: Iterable[str],
+        page_bb: Union[str, tuple] = "0.000,0.000,595.320,841.920"):
+
+    def gen():
+        for bbox in bboxes:
+            yield bbox, extract_page_image_bbox(image, bbox, page_bb)
+
+    return {k: v for (k, v) in gen()}

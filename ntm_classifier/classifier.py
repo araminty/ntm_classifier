@@ -1,10 +1,12 @@
+from ntm_classifier.image_from_document import (
+    page_extract_xml_figures, extract_page_images_bboxes)
 from typing import Union
 from PIL.Image import Image
 # import torch
 
 from ntm_classifier.load_resources import (
     # load_mappings,
-    load_primary,
+    load_model,
     process_mappings_group,
 )
 from ntm_classifier.extract import extract_page_images
@@ -17,8 +19,9 @@ class lazy_model:
     # vscode unit tests freezing up while checking
     # import validity
 
-    def __init__(self):
+    def __init__(self, filename=None):
         self.model = None
+        self.filename = filename
         self.device = 'cuda' if cuda.is_available() else 'cpu'
 
     def classify(self, input_tensor, model=None):
@@ -36,7 +39,10 @@ class lazy_model:
             self.model = model
 
         if self.model is None:
-            self.model = load_primary()
+            if self.filename is None:
+                self.model = load_model()
+            else:
+                self.model = load_model(self.filename)
 
         with no_grad():
             result = self.model(input_tensor.to(self.device))
@@ -89,3 +95,16 @@ def classify_page(
 
     images = extract_page_images(page, coordinates)
     return classify_extractions_dictionary(images)
+
+
+def classify_page_from_xml(
+        page: Image,
+        xml):
+    page_bbox = xml.get('bbox')
+    figure_elements = page_extract_xml_figures(xml)
+    coordinates = [fig.get('bbox') for fig in figure_elements]
+
+    bbox_image_dict = extract_page_images_bboxes(
+        page, coordinates, page_bbox)
+
+    return {k: classify(v) for (k, v) in bbox_image_dict.items()}

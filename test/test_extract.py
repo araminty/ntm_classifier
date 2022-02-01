@@ -120,5 +120,6 @@ class TestFullPage(unittest.TestCase):
 
         self.assertEqual(sorted(results.items()), sorted(results2.items()))
 
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)  # pragma: no cover
