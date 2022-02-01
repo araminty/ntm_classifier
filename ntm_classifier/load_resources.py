@@ -9,17 +9,19 @@ from PIL import Image
 import xml.etree.ElementTree as ET
 
 
-def load_xml_test(name = 'second_xml.xml'):
+def load_xml_test(name='second_xml.xml'):
     filename = resource_filename('ntm_data.test_files', name)
     with open(filename) as file:
         tree = ET.parse(file)
     return tree.getroot()
 
-def load_text_lines_list(name = 'uncombined_bboxes.txt'):
+
+def load_text_lines_list(name='uncombined_bboxes.txt'):
     filename = resource_filename('ntm_data.test_files', name)
     with open(filename) as file:
         lines = file.readlines()
-    return [ l.strip('\n') for l in lines]
+    return [l.strip('\n') for l in lines]
+
 
 def save_model_torch_script(
         model,
@@ -128,7 +130,7 @@ def load_test_tensor():
     return result
 
 
-def load_test_page(filename = 'sample_page.png'):
+def load_test_page(filename='sample_page.png'):
     img_path = resource_filename('ntm_data.test_files', filename)
     with Image.open(img_path) as img:
         img = img.crop((0, 0, img.size[0], img.size[1]))

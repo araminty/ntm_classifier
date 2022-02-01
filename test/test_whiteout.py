@@ -13,9 +13,6 @@ from ntm_classifier.image_from_document import (
 from ntm_classifier.load_resources import (
     load_xml_test, load_text_lines_list)
 
-from ntm_classifier.image_from_document import (
-    page_get_textbox_locations_list)
-
 
 class TestWhiteOut(unittest.TestCase):
 
