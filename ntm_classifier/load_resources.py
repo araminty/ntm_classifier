@@ -1,12 +1,20 @@
 import json
 # import pickle
 import torch
+import torchvision
 
 from collections import OrderedDict  # noqa
 from pkg_resources import resource_string, resource_filename
 # from keras.preprocessing.image import load_img
 from PIL import Image
 import xml.etree.ElementTree as ET
+from importlib.resources import path as ir_path
+
+
+def get_image_dir_path(name='test_image_dir'):
+    with ir_path('ntm_data.test_files', name) as path_obj:
+        path = str(path_obj)
+    return path
 
 
 def load_xml_test(name='second_xml.xml'):
@@ -49,42 +57,24 @@ def load_base_model():
     # return torch.load(model_path)
 
 
-def load_model(model_name="resnet_50_13_5.pt"):
-    resnet50 = torch.hub.load(  # noqa
-        'NVIDIA/DeepLearningExamples:torchhub',
-        # num_classes=13,
-        'nvidia_resnet50',
-        pretrained=True,
-    )
-    model_path = resource_filename('ntm_data', model_name)
+def load_model(state_dict_name="primary_state_dict.pt"):
 
-    return torch.load(model_path)
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-    # resnet50 = torch.hub.load(  # noqa
-    #     'NVIDIA/DeepLearningExamples:torchhub',
-    #     # num_classes=13,
-    #     'nvidia_resnet50',
-    #     pretrained=True,
-    # )
+    state_dict_path = resource_filename('ntm_data', state_dict_name)
 
-    # model = torch.nn.Sequential(OrderedDict({
-    #     'resnet': resnet50,
-    #     'fc': torch.nn.Linear(1000, n),
-    #     'output': torch.nn.LogSoftmax(dim=1)
-    # }))
+    state_dict = torch.load(state_dict_path)
+    n_outputs = state_dict.get('fc.weight').shape[0]
+    fc_in = state_dict.get('fc.weight').shape[1]
 
-    # # weights = torch.load(resource_stream('ntm_data', 'state_dict.pt'))
-    # weights_path = resource_filename('ntm_data', 'state_dict.pt')
-    # weights = torch.load(weights_path)
-
-    # try:
-    #     model.load_state_dict(weights)
-    # except RuntimeError:
-    #     # TODO: This obviously needs to get removed
-    #     # but I'm still playing around with the exact model dimensions
-    #     print("model size mismatch")
-
-    # return model
+    resnet = torchvision.models.resnet50()
+    model = torch.nn.Sequential(OrderedDict({
+        'resnet': resnet,
+        'fc': torch.nn.Linear(fc_in, n_outputs),
+        'output': torch.nn.LogSoftmax(dim=1)
+    }))
+    model.load_state_dict(state_dict)
+    return model.to(device)
 
 
 def load_mappings():

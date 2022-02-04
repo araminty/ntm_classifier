@@ -1,6 +1,8 @@
+import os
 from ntm_classifier.image_from_document import (
     page_extract_xml_figures, extract_page_images_bboxes)
 from typing import Union
+import PIL
 from PIL.Image import Image
 # import torch
 
@@ -37,6 +39,7 @@ class lazy_model:
 
         if model is not None:
             self.model = model
+            self.model.to(self.device)
 
         if self.model is None:
             if self.filename is None:
@@ -108,3 +111,21 @@ def classify_page_from_xml(
         page, coordinates, page_bbox)
 
     return {k: classify(v) for (k, v) in bbox_image_dict.items()}
+
+
+def classify_directory(directory_path):
+    if not os.path.isdir(directory_path):
+        return {'error': f"{directory_path} is not a directory"}
+
+    file_names = os.listdir(directory_path)
+
+    def gen():
+        for file in file_names:
+            if file[-3:] == 'png':
+                path = os.path.join(directory_path, file)
+                with PIL.Image.open(path) as img:
+                    img = img.crop((0, 0, img.size[0], img.size[1]))
+
+                yield path, classify(img)
+
+    return {k: v for (k, v) in gen()}

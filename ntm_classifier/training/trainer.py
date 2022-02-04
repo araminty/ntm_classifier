@@ -4,9 +4,10 @@ import torch
 from torch import optim
 from torch import nn
 from ntm_classifier.check_tqdm import tqdm_check
-from ntm_classifier.load_resources import (
-    load_base_model, save_model_torch_script)
-# from pkg_resources import resource_filename
+from ntm_classifier.load_resources import load_base_model
+# (
+#     load_base_model, save_model_torch_script)
+from pkg_resources import resource_filename
 
 if tqdm_check():
     from tqdm import tqdm
@@ -96,6 +97,7 @@ class Trainer:
 
     def save(self, name=None):
         if name is None:
-            name = f"n_{self.n_labels}_epochs_{self.epochs}_model.pt"
-        # filepath = resource_filename('ntm_data', name)
-        save_model_torch_script(self.network, name=name)
+            name = f"n_{self.n_labels}_epochs_{self.epochs}_state_dict.pt"
+        filepath = resource_filename('ntm_data', name)
+        torch.save(self.network.state_dict(), filepath)
+        # save_model_torch_script(self.network, name=name)

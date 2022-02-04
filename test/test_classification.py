@@ -9,13 +9,22 @@ from ntm_classifier.classifier import (
     label,
     classify,
     primary_mappings,
-    classify_page_from_xml
+    classify_page_from_xml,
+    classify_directory,
 )
 from ntm_classifier.load_resources import (
+    get_image_dir_path,
     load_test_image,
     load_test_tensor,
     load_test_page,
     load_xml_test)
+
+
+class TestDirClassify(unittest.TestCase):
+    def test_classify_directory(self):
+        dir_path = get_image_dir_path()
+        classifications = classify_directory(dir_path)
+        self.assertIsInstance(classifications, dict)
 
 
 class TestPageClassify(unittest.TestCase):
@@ -31,16 +40,16 @@ class TestPageClassify(unittest.TestCase):
 
 
 class TestClassify(unittest.TestCase):
-    test_image = load_test_image()
-    test_array = load_test_tensor()
+    
 
     def test_convert_img_to_tensor(self):
-        test_image = self.test_image
+        test_image = load_test_image()
         result = img_to_tensor(test_image)
         self.assertIsInstance(result, Tensor)
 
     def test_classify_tensor_to_int(self):
-        result = classify_to_num(self.test_array)
+        test_array = load_test_tensor()
+        result = classify_to_num(test_array)
         self.assertIsInstance(result, int)
 
     def test_convert_int_to_str(self):
@@ -50,7 +59,8 @@ class TestClassify(unittest.TestCase):
         self.assertIn(result, primary_mappings.values())
 
     def test_classify_png_to_str(self):
-        result = classify(self.test_image)
+        test_image = load_test_image()
+        result = classify(test_image)
         self.assertIsInstance(result, str)
         self.assertIn(result, primary_mappings.values())
 

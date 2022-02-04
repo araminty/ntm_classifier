@@ -76,7 +76,7 @@ class ImageDataset(Dataset):
 
     def map_outputs(self):
         output_labels = self.y.str.lower().apply(self.output_map.get)
-        self.na_value = output_labels.max()+1.0
+        self.na_value = output_labels.max()
         output_labels = output_labels.fillna(self.na_value)
         return torch.from_numpy(output_labels.values).to(self.device).long()
 
