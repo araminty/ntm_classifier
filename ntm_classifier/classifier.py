@@ -1,3 +1,4 @@
+import xml
 import os
 from ntm_classifier.image_from_document import (
     page_extract_xml_figures, extract_page_images_bboxes)
@@ -121,7 +122,7 @@ def classify_directory(directory_path):
 
     def gen():
         for file in file_names:
-            if file[-3:] == 'png':
+            if file[-3:] in ('png', 'bmp', 'jpg'):
                 path = os.path.join(directory_path, file)
                 with PIL.Image.open(path) as img:
                     img = img.crop((0, 0, img.size[0], img.size[1]))
@@ -129,3 +130,32 @@ def classify_directory(directory_path):
                 yield path, classify(img)
 
     return {k: v for (k, v) in gen()}
+
+
+tree_types = Union[xml.etree.ElementTree.ElementTree,
+                   xml.etree.ElementTree.Element]
+
+
+def classify_ntm_format_from_images(
+        tree: tree_types,
+        directory_path: str = '/tmp/images'):
+    results = classify_directory(directory_path)
+
+    image_figs = tree.findall('.//image[@src]...')
+
+    def joiner(fig):
+        src = fig.find('image').get('src')
+        return os.path.join(directory_path, src)
+    img_map = {fig.get('name'): joiner(fig) for fig in image_figs}
+
+    def gen():
+        for page in tree.findall('page'):
+            page_id = page.get('id')
+            for fig in page.iter('figure'):
+                name = fig.get('name')
+                if img_map.get(name) in results:
+                    result = results.get(img_map.get(name))
+                    bbox = list(map(float, fig.get('bbox').split(',')))
+                    yield [result] + bbox + [page_id]
+
+    return list(gen())

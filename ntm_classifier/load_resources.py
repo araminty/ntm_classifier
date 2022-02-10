@@ -11,6 +11,28 @@ import xml.etree.ElementTree as ET
 from importlib.resources import path as ir_path
 
 
+def open_pdf(filepath):
+    from PyPDF2 import PdfFileReader
+    with open(filepath, 'rb') as file:
+        pdf = PdfFileReader(file)
+    return pdf
+
+
+def get_test_pdf_path(
+        modpath="ntm_data.test_files",
+        name="1964674_LV_01_2022.pdf"):
+    with ir_path('ntm_data.test_files', name) as path_obj:
+        path = str(path_obj)
+    return path
+
+
+def get_test_pdf_obj(
+        modpath="ntm_data.test_files",
+        name="1964674_LV_01_2022.pdf"):
+    filepath = get_test_pdf_path(modpath=modpath, name=name)
+    return open_pdf(filepath)
+
+
 def get_image_dir_path(name='test_image_dir'):
     with ir_path('ntm_data.test_files', name) as path_obj:
         path = str(path_obj)

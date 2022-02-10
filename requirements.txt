@@ -4,3 +4,4 @@ pandas
 tqdm
 sklearn
 matplotlib
+pyPDF2
