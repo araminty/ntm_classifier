@@ -1,8 +1,36 @@
-torch>=1.10.1
-torchvision>=0.11.1
-pandas
-tqdm
-sklearn
-matplotlib
-pyPDF2
-pdfminer.six
+atomicwrites==1.4.0; python_version >= "3.6" and python_full_version < "3.0.0" and sys_platform == "win32" or sys_platform == "win32" and python_version >= "3.6" and python_full_version >= "3.4.0"
+attrs==21.4.0; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.6"
+cffi==1.15.0; python_version >= "3.6"
+chardet==4.0.0; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.6"
+colorama==0.4.4; python_version >= "3.6" and python_full_version < "3.0.0" and platform_system == "Windows" and sys_platform == "win32" or python_full_version >= "3.5.0" and platform_system == "Windows" and sys_platform == "win32" and python_version >= "3.6"
+cryptography==36.0.1; python_version >= "3.6"
+cycler==0.11.0; python_version >= "3.7"
+fonttools==4.29.1; python_version >= "3.7"
+iniconfig==1.1.1; python_version >= "3.6"
+joblib==1.1.0; python_version >= "3.7"
+kiwisolver==1.3.2; python_version >= "3.7"
+matplotlib==3.5.1; python_version >= "3.7"
+numpy==1.22.2
+packaging==21.3; python_version >= "3.7"
+pandas==1.4.1; python_version >= "3.8"
+pdfminer.six==20211012; python_version >= "3.6"
+pillow==9.0.1; python_version >= "3.7"
+pluggy==1.0.0; python_version >= "3.6"
+py==1.11.0; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.6"
+pycparser==2.21; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.6"
+pyparsing==3.0.7; python_version >= "3.7"
+pypdf2==1.26.0
+pytest==7.0.1; python_version >= "3.6"
+python-dateutil==2.8.2; python_version >= "3.8" and python_full_version < "3.0.0" or python_full_version >= "3.3.0" and python_version >= "3.8"
+pytz==2021.3; python_version >= "3.8"
+scikit-learn==1.0.2; python_version >= "3.7"
+scipy==1.6.1; python_version >= "3.7"
+setuptools-scm==6.4.2; python_version >= "3.7"
+six==1.16.0; python_version >= "3.8" and python_full_version < "3.0.0" or python_full_version >= "3.3.0" and python_version >= "3.8"
+sklearn==0.0
+threadpoolctl==3.1.0; python_version >= "3.7"
+tomli==2.0.1; python_version >= "3.7"
+torch==1.10.2; python_full_version >= "3.6.2"
+torchvision==0.11.3
+tqdm==4.63.0; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.4.0")
+typing-extensions==4.1.1; python_version >= "3.6" and python_full_version >= "3.6.2"
