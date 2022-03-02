@@ -5,3 +5,4 @@ tqdm
 sklearn
 matplotlib
 pyPDF2
+pdfminer.six
