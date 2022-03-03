@@ -1,15 +1,26 @@
 import unittest
 import os
+import shutil
 
 from ntm_classifier.utils_e2.pdf2xml import (
     get_xml_tmp_path,
     pdf_to_xml_file,
     pdf_to_xml_object,
+    make_page_images,
 )
 from ntm_classifier.load_resources import get_test_pdf_path
 
 
 class TestPDF2XML(unittest.TestCase):
+
+    def test_get_pdf_images(self):
+        pdf_path = get_test_pdf_path()
+        make_page_images(pdf_path)
+        images_path = os.path.join(pdf_path[:-4], 'page_images_high_res')
+        image_names = os.listdir(images_path)
+        shutil.rmtree(pdf_path[:-4])
+        self.assertTrue(len(image_names) > 0)
+
     def test_get_test_obj_path(self):
         pdf_path = get_test_pdf_path()
         pdf_path_end = '/'.join(pdf_path.split('/')[-3:])

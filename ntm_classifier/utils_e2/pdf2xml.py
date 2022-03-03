@@ -80,35 +80,17 @@ def pdf_to_xml_file(
     return buffer_to_buffer(pdf, xml)
 
 
-# with open(pdf_path, 'rb') as pdf_buffer:
-#     pdf_flex_to_xml_file(pdf_buffer, xml_path)
+def make_page_images(pdf_path):
+    from pdf2image import convert_from_path
+    if not os.path.exists(pdf_path[:-4]):
+        os.mkdir(pdf_path[:-4])
+    pihr = os.path.join(pdf_path[:-4], "page_images_high_res")
+    if not os.path.exists(pihr):
+        os.mkdir(pihr)
+    if not os.path.exists('/tmp/page_images'):
+        os.mkdir('/tmp/page_images')
 
-
-# pdf_path = get_test_pdf_path()
-
-# with open(pdf_path, 'rb') as pdf_file:
-#     print(type(pdf_file))
-#     print(isinstance(pdf_file, BufferedReader))
-
-# # import io
-# # with io.open(pdf_path, 'rb') as pdf_file:
-# #     print(type(pdf_file))
-
-
-# def pdf_file_to_xml_file(
-#         pdf_path: str,
-#         xml_path: str = None,
-#         maxpages=20):
-
-#     if xml_path is None:
-#         xml_path = pdf_path.replace('.pdf', '.xml')
-
-#     with open(pdf_path, 'rb') as pdf_file:
-#         with open(xml_path, 'wb') as xml_file:
-#             extract_text_to_fp(
-#                 pdf_file,
-#                 xml_file,
-#                 output_type='xml',
-#                 maxpages=maxpages)
-
-#     return xml_path
+    pages = convert_from_path(pdf_path, output_folder='/tmp/page_images/')
+    for i, page in enumerate(pages):
+        page.save(os.path.join(pihr,
+                               f"Page-{'0'*(6-len(str(i)))}{i}.png"))
